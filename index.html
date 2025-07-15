@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Malla Interactiva - Tareas del Hogar</title>
+  <title>Tareas del Hogar - Interactivo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,24 +13,18 @@
       text-align: center;
       color: #003366;
     }
-    .reglas {
-      background: #d9ecff;
-      border-left: 5px solid #3399ff;
-      padding: 15px;
-      margin-bottom: 25px;
-      border-radius: 8px;
-    }
-    .categorias {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
+    .subtitulo {
+      text-align: center;
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 20px;
     }
     .categoria {
       background: white;
       border-radius: 12px;
       padding: 15px;
-      width: 300px;
+      margin: 15px auto;
+      max-width: 500px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .categoria h2 {
@@ -44,7 +38,7 @@
       margin: 8px 0;
       border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s, opacity 0.3s;
+      transition: background-color 0.3s;
     }
     .tarea.completada {
       background-color: #4caf50;
@@ -59,58 +53,65 @@
 </head>
 <body>
 
-  <h1>Malla Interactiva: Tareas del Hogar</h1>
+  <h1>Malla de Tareas del Hogar</h1>
+  <p class="subtitulo">Mostrando solo tareas para hoy: <span id="dia"></span></p>
 
-  <div class="reglas">
-    <strong>Reglas:</strong>
-    <ul>
-      <li>🧺 Se lava ropa los <strong>Lunes, Miércoles y Sábados</strong>.</li>
-      <li>👕 Se descuelga ropa los <strong>Martes, Jueves y Domingo</strong>.</li>
-      <li>🧦 Se dobla ropa a más tardar los <strong>Miércoles, Viernes y Domingo</strong>.</li>
-      <li>🐱 El arenero se lava los <strong>Sábados</strong>.</li>
-      <li>🍽️ La loza no debe estar más de <strong>2 días</strong> sucia.</li>
-      <li>🛏️ Cada pieza es responsabilidad de su ocupante. El <strong>Sábado</strong> se hace orden colaborativo si hay evaluaciones.</li>
-      <li>🧹 El resto de tareas son <strong>diarias</strong>.</li>
-    </ul>
-  </div>
-
-  <div class="categorias" id="contenedorTareas"></div>
+  <div id="contenedorTareas"></div>
 
   <script>
+    const hoy = new Date();
+    const diaSemana = hoy.getDay(); // 0: domingo, 1: lunes, ..., 6: sábado
+    const nombresDias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    document.getElementById("dia").textContent = nombresDias[diaSemana];
+
+    const tareasPorDia = {
+      0: ['Descolgar Ropa', 'Doblar Ropa'],                        // Domingo
+      1: ['Lavar y colgar ropa'],                                 // Lunes
+      2: ['Descolgar Ropa'],                                      // Martes
+      3: ['Lavar y colgar ropa', 'Doblar Ropa'],                 // Miércoles
+      4: ['Descolgar Ropa'],                                      // Jueves
+      5: ['Doblar Ropa'],                                         // Viernes
+      6: ['Lavar y colgar ropa', 'Limpiar arenero', 'Intervención pieza'] // Sábado
+    };
+
     const tareas = {
       "Cocina": [
-        { nombre: "Lavar Loza", encargado: "Felix" },
-        { nombre: "Guardar Loza", encargado: "Felix" },
-        { nombre: "Limpiar cocina", encargado: "Ivi" },
-        { nombre: "Limpiar lava platos", encargado: "Ivi" },
-        { nombre: "Limpiar muebles Cocina", encargado: "Ivi" }
+        { nombre: "Lavar Loza", encargado: "Felix", diaria: true },
+        { nombre: "Guardar Loza", encargado: "Felix", diaria: true },
+        { nombre: "Limpiar cocina", encargado: "Ivi", diaria: true },
+        { nombre: "Limpiar lava platos", encargado: "Ivi", diaria: true },
+        { nombre: "Limpiar muebles Cocina", encargado: "Ivi", diaria: true }
       ],
       "Baño": [
-        { nombre: "Limpiar ducha", encargado: "Cony" },
-        { nombre: "Limpiar lava manos", encargado: "Cony" },
-        { nombre: "Limpiar water", encargado: "Cony" }
+        { nombre: "Limpiar ducha", encargado: "Cony", diaria: true },
+        { nombre: "Limpiar lava manos", encargado: "Cony", diaria: true },
+        { nombre: "Limpiar water", encargado: "Cony", diaria: true }
       ],
       "Ropa": [
-        { nombre: "Lavar y colgar ropa", encargado: "Ivi" },
-        { nombre: "Descolgar Ropa", encargado: "Cony" },
-        { nombre: "Doblar Ropa", encargado: "Ivi" },
-        { nombre: "Guardar Ropa", encargado: "Cada uno" }
+        { nombre: "Lavar y colgar ropa", encargado: "Ivi", diaria: false },
+        { nombre: "Descolgar Ropa", encargado: "Cony", diaria: false },
+        { nombre: "Doblar Ropa", encargado: "Ivi", diaria: false },
+        { nombre: "Guardar Ropa", encargado: "Cada uno", diaria: true }
       ],
       "Mascotas": [
-        { nombre: "Dar de comer perros", encargado: "Felix" },
-        { nombre: "Limpiar arenero", encargado: "Felix" }
+        { nombre: "Dar de comer perros", encargado: "Felix", diaria: true },
+        { nombre: "Limpiar arenero", encargado: "Felix", diaria: false }
       ],
       "Espacios Comunes": [
-        { nombre: "Trapear la casa", encargado: "Felix" },
-        { nombre: "Ordenar living comedor", encargado: "Cony" },
-        { nombre: "Intervención pieza", encargado: "Todos (Sábado)" }
+        { nombre: "Trapear la casa", encargado: "Felix", diaria: true },
+        { nombre: "Ordenar living comedor", encargado: "Cony", diaria: true },
+        { nombre: "Intervención pieza", encargado: "Todos (Sábado)", diaria: false }
       ]
     };
 
-    function crearTareas() {
+    function crearTareasDelDia() {
       const contenedor = document.getElementById("contenedorTareas");
+      const tareasDelDia = tareasPorDia[diaSemana] || [];
 
       for (const [categoria, lista] of Object.entries(tareas)) {
+        const listaFiltrada = lista.filter(t => t.diaria || tareasDelDia.includes(t.nombre));
+        if (listaFiltrada.length === 0) continue;
+
         const divCategoria = document.createElement("div");
         divCategoria.className = "categoria";
 
@@ -118,7 +119,7 @@
         titulo.textContent = categoria;
         divCategoria.appendChild(titulo);
 
-        lista.forEach(tarea => {
+        listaFiltrada.forEach(tarea => {
           const divTarea = document.createElement("div");
           divTarea.className = "tarea";
           divTarea.innerHTML = `<strong>${tarea.nombre}</strong><br><span class="encargado">Encargado: ${tarea.encargado}</span>`;
@@ -132,7 +133,8 @@
       }
     }
 
-    crearTareas();
+    crearTareasDelDia();
   </script>
+
 </body>
 </html>
