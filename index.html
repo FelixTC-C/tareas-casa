@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Interactiva - Tareas del Hogar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f7ff;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #003366;
+    }
+    .reglas {
+      background: #d9ecff;
+      border-left: 5px solid #3399ff;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+    }
+    .categorias {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .categoria {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      width: 300px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .categoria h2 {
+      text-align: center;
+      color: #0059b3;
+      margin-bottom: 10px;
+    }
+    .tarea {
+      background: #a6d9ff;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, opacity 0.3s;
+    }
+    .tarea.completada {
+      background-color: #4caf50;
+      color: white;
+      text-decoration: line-through;
+    }
+    .encargado {
+      font-size: 0.9em;
+      color: #003366;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Malla Interactiva: Tareas del Hogar</h1>
+
+  <div class="reglas">
+    <strong>Reglas:</strong>
+    <ul>
+      <li>🧺 Se lava ropa los <strong>Lunes, Miércoles y Sábados</strong>.</li>
+      <li>👕 Se descuelga ropa los <strong>Martes, Jueves y Domingo</strong>.</li>
+      <li>🧦 Se dobla ropa a más tardar los <strong>Miércoles, Viernes y Domingo</strong>.</li>
+      <li>🐱 El arenero se lava los <strong>Sábados</strong>.</li>
+      <li>🍽️ La loza no debe estar más de <strong>2 días</strong> sucia.</li>
+      <li>🛏️ Cada pieza es responsabilidad de su ocupante. El <strong>Sábado</strong> se hace orden colaborativo si hay evaluaciones.</li>
+      <li>🧹 El resto de tareas son <strong>diarias</strong>.</li>
+    </ul>
+  </div>
+
+  <div class="categorias" id="contenedorTareas"></div>
+
+  <script>
+    const tareas = {
+      "Cocina": [
+        { nombre: "Lavar Loza", encargado: "Felix" },
+        { nombre: "Guardar Loza", encargado: "Felix" },
+        { nombre: "Limpiar cocina", encargado: "Ivi" },
+        { nombre: "Limpiar lava platos", encargado: "Ivi" },
+        { nombre: "Limpiar muebles Cocina", encargado: "Ivi" }
+      ],
+      "Baño": [
+        { nombre: "Limpiar ducha", encargado: "Cony" },
+        { nombre: "Limpiar lava manos", encargado: "Cony" },
+        { nombre: "Limpiar water", encargado: "Cony" }
+      ],
+      "Ropa": [
+        { nombre: "Lavar y colgar ropa", encargado: "Ivi" },
+        { nombre: "Descolgar Ropa", encargado: "Cony" },
+        { nombre: "Doblar Ropa", encargado: "Ivi" },
+        { nombre: "Guardar Ropa", encargado: "Cada uno" }
+      ],
+      "Mascotas": [
+        { nombre: "Dar de comer perros", encargado: "Felix" },
+        { nombre: "Limpiar arenero", encargado: "Felix" }
+      ],
+      "Espacios Comunes": [
+        { nombre: "Trapear la casa", encargado: "Felix" },
+        { nombre: "Ordenar living comedor", encargado: "Cony" },
+        { nombre: "Intervención pieza", encargado: "Todos (Sábado)" }
+      ]
+    };
+
+    function crearTareas() {
+      const contenedor = document.getElementById("contenedorTareas");
+
+      for (const [categoria, lista] of Object.entries(tareas)) {
+        const divCategoria = document.createElement("div");
+        divCategoria.className = "categoria";
+
+        const titulo = document.createElement("h2");
+        titulo.textContent = categoria;
+        divCategoria.appendChild(titulo);
+
+        lista.forEach(tarea => {
+          const divTarea = document.createElement("div");
+          divTarea.className = "tarea";
+          divTarea.innerHTML = `<strong>${tarea.nombre}</strong><br><span class="encargado">Encargado: ${tarea.encargado}</span>`;
+          divTarea.addEventListener("click", () => {
+            divTarea.classList.toggle("completada");
+          });
+          divCategoria.appendChild(divTarea);
+        });
+
+        contenedor.appendChild(divCategoria);
+      }
+    }
+
+    crearTareas();
+  </script>
+</body>
+</html>
