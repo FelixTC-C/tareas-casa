@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tareas del Hogar - Por Persona</title>
+  <meta charset="UTF-8">
+  <title>Tareas del Hogar por Persona</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -45,36 +45,32 @@
       color: white;
       text-decoration: line-through;
     }
-    .descripcion {
-      font-size: 0.85em;
-      color: #003366;
-    }
   </style>
 </head>
 <body>
 
   <h1>Tareas del Hogar por Persona</h1>
-  <p class="subtitulo">Mostrando tareas para hoy: <span id="dia"></span></p>
+  <p class="subtitulo">Tareas para hoy: <span id="dia"></span></p>
 
   <div id="contenedorTareas"></div>
 
   <script>
     const hoy = new Date();
-    const diaSemana = hoy.getDay(); // 0: domingo, ..., 6: sábado
+    const diaSemana = hoy.getDay();
     const nombresDias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     document.getElementById("dia").textContent = nombresDias[diaSemana];
 
     const tareasPorDia = {
-      0: ['Descolgar Ropa', 'Doblar Ropa'],                        
-      1: ['Lavar y colgar ropa'],                                 
-      2: ['Descolgar Ropa'],                                      
-      3: ['Lavar y colgar ropa', 'Doblar Ropa'],                 
-      4: ['Descolgar Ropa'],                                      
-      5: ['Doblar Ropa'],                                         
-      6: ['Lavar y colgar ropa', 'Limpiar arenero', 'Intervención pieza'] 
+      0: ['Descolgar Ropa', 'Doblar Ropa'],
+      1: ['Lavar ropa', 'Colgar ropa'],
+      2: ['Descolgar Ropa'],
+      3: ['Lavar ropa', 'Colgar ropa', 'Doblar Ropa'],
+      4: ['Descolgar Ropa'],
+      5: ['Doblar Ropa'],
+      6: ['Lavar ropa', 'Colgar ropa', 'Limpiar arenero', 'Intervención pieza']
     };
 
-    const todasTareas = [
+    let tareasBase = [
       { nombre: "Lavar Loza", persona: "Felix", diaria: true },
       { nombre: "Guardar Loza", persona: "Felix", diaria: true },
       { nombre: "Limpiar cocina", persona: "Ivi", diaria: true },
@@ -83,7 +79,6 @@
       { nombre: "Limpiar ducha", persona: "Cony", diaria: true },
       { nombre: "Limpiar lava manos", persona: "Cony", diaria: true },
       { nombre: "Limpiar water", persona: "Cony", diaria: true },
-      { nombre: "Lavar y colgar ropa", persona: "Ivi", diaria: false },
       { nombre: "Descolgar Ropa", persona: "Cony", diaria: false },
       { nombre: "Doblar Ropa", persona: "Ivi", diaria: false },
       { nombre: "Guardar Ropa", persona: "Cada uno", diaria: true },
@@ -91,12 +86,25 @@
       { nombre: "Limpiar arenero", persona: "Felix", diaria: false },
       { nombre: "Trapear la casa", persona: "Felix", diaria: true },
       { nombre: "Ordenar living comedor", persona: "Cony", diaria: true },
-      { nombre: "Intervención pieza", persona: "Todos", diaria: false }
+      { nombre: "Intervención pieza", persona: "Todos", diaria: false },
+      { nombre: "Lavar ropa", persona: "Ivi", diaria: false },
+      { nombre: "Colgar ropa", persona: "Ivi", diaria: false }
     ];
+
+    // Copiar tareas de "Todos" a cada persona
+    const personas = ["Felix", "Ivi", "Cony"];
+    const tareasTodos = tareasBase.filter(t => t.persona === "Todos");
+    tareasTodos.forEach(tarea => {
+      personas.forEach(p => {
+        tareasBase.push({ ...tarea, persona: p });
+      });
+    });
+    // Eliminar la categoría "Todos"
+    tareasBase = tareasBase.filter(t => t.persona !== "Todos");
 
     function obtenerTareasDeHoy() {
       const hoyTareas = tareasPorDia[diaSemana] || [];
-      return todasTareas.filter(t => t.diaria || hoyTareas.includes(t.nombre));
+      return tareasBase.filter(t => t.diaria || hoyTareas.includes(t.nombre));
     }
 
     function agruparPorPersona(tareas) {
@@ -110,8 +118,19 @@
       return personas;
     }
 
+    function guardarEstado(completadas) {
+      const key = "tareas_completadas_" + new Date().toDateString();
+      localStorage.setItem(key, JSON.stringify(completadas));
+    }
+
+    function cargarEstado() {
+      const key = "tareas_completadas_" + new Date().toDateString();
+      return JSON.parse(localStorage.getItem(key) || "[]");
+    }
+
     function mostrarTareas() {
       const tareasHoy = obtenerTareasDeHoy();
+      const completadas = new Set(cargarEstado());
       const tareasPorPersona = agruparPorPersona(tareasHoy);
       const contenedor = document.getElementById("contenedorTareas");
 
@@ -127,8 +146,17 @@
           const divTarea = document.createElement("div");
           divTarea.className = "tarea";
           divTarea.innerHTML = `<strong>${tarea.nombre}</strong>`;
+          if (completadas.has(tarea.persona + ":" + tarea.nombre)) {
+            divTarea.classList.add("completada");
+          }
           divTarea.addEventListener("click", () => {
             divTarea.classList.toggle("completada");
+            if (divTarea.classList.contains("completada")) {
+              completadas.add(tarea.persona + ":" + tarea.nombre);
+            } else {
+              completadas.delete(tarea.persona + ":" + tarea.nombre);
+            }
+            guardarEstado([...completadas]);
           });
           divPersona.appendChild(divTarea);
         });
